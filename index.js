@@ -27,7 +27,7 @@ const chatHistory = { messages: [] };
 
 app.get("/", function (req, res) {
   //   console.log(req);
-  res.send("<pre>" + JSON.stringify(received_updates, null, 2) + "</pre>");
+  res.send("<pre>" + JSON.stringify(chatHistory, null, 2) + "</pre>");
 });
 
 // app.get("*", (req, res) => {
