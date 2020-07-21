@@ -13,18 +13,20 @@ const pusher = new Pusher({
   encrypted: true,
 });
 
-const whitelist = ["http://localhost:3000"];
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-};
+// const whitelist = ["http://localhost:3000"];
+// const corsOptions = {
+//   origin: function (origin, callback) {
+//     if (whitelist.indexOf(origin) !== -1) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("Not allowed by CORS"));
+//     }
+//   },
+// };
 
-// app.use(cors(corsOptions));
+const corsOptions = { origin: "http://localhost:3000" };
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -46,7 +48,7 @@ app.get("/", function (req, res) {
 //   return handler(req, res);
 // });
 
-app.post("/message", cors(corsOptions), (req, res, next) => {
+app.post("/message", (req, res, next) => {
   const { user = null, message = "", timestamp = +new Date() } = req.body;
   // const sentimentScore = sentiment.analyze(message).score;
   const chat = { user, message, timestamp };
@@ -55,7 +57,7 @@ app.post("/message", cors(corsOptions), (req, res, next) => {
   pusher.trigger("chat-room", "new-message", { chat });
 });
 
-app.post("/messages", cors(corsOptions), (req, res, next) => {
+app.post("/messages", (req, res, next) => {
   res.json({ ...chatHistory, status: "success" });
 });
 
