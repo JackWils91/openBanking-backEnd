@@ -24,7 +24,7 @@ const pusher = new Pusher({
 //   },
 // };
 
-const corsOptions = { origin: "http://localhost:3000" };
+const corsOptions = { origin: "https://overlay-test.vercel.app" };
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
