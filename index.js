@@ -61,4 +61,15 @@ app.post("/messages", (req, res, next) => {
   res.json({ ...chatHistory, status: "success" });
 });
 
+app.post("/end-chat", (req, res, next) => {
+  console.log("api/pusher/end-chat", req.body, "method", req.method);
+  const { name, channel } = req.body;
+  console.log("name", name, "channel_vacated", channel);
+  if (name === "channel_vacated") {
+    chatHistory.messages = [];
+    console.log("global chat history variable should be cleared", chatHistory);
+    res.json({ res: "Chat global variable cleared" });
+  }
+});
+
 app.listen();
