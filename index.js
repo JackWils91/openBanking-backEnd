@@ -64,7 +64,7 @@ app.post("/messages", (req, res, next) => {
 });
 
 app.post("/end-chat", (req, res, next) => {
-  console.log("api/pusher/end-chat", req.body, "method", req.method);
+  console.log("/end-chat", req.body, "method", req.method);
   const { name, channel } = req.body;
   console.log("name", name, "channel_vacated", channel);
   if (name === "channel_vacated") {
