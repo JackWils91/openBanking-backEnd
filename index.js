@@ -15,18 +15,18 @@ const pusher = new Pusher({
 
 // error im getting in dev is because not https
 // that's why you always run your server locally
-// const whitelist = ["http://localhost:3000"];
-// const corsOptions = {
-//   origin: function (origin, callback) {
-//     if (whitelist.indexOf(origin) !== -1) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error("Not allowed by CORS"));
-//     }
-//   },
-// };
+const whitelist = ["http://localhost:3000", "https://overlay-test.vercel.app"];
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+};
 
-const corsOptions = { origin: "https://overlay-test.vercel.app" };
+// const corsOptions = { origin: "https://overlay-test.vercel.app" };
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
