@@ -12,16 +12,17 @@ const pusher = new Pusher({
   cluster: process.env.PUSHER_APP_CLUSTER,
   encrypted: true,
 });
+
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 const PORT = process.env.PORT || 5000;
 
 app.set("port", PORT);
 app.listen(app.get("port"), () => {
   console.log(`listening at localhost:${PORT}...`);
 });
-
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 const chatHistory = { messages: [] };
 
