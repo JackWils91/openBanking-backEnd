@@ -13,6 +13,8 @@ const pusher = new Pusher({
   encrypted: true,
 });
 
+// error im getting in dev is because not https
+// that's why you always run your server locally
 // const whitelist = ["http://localhost:3000"];
 // const corsOptions = {
 //   origin: function (origin, callback) {
