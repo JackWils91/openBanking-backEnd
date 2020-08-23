@@ -51,9 +51,14 @@ app.get("/", function (req, res) {
 // });
 
 app.post("/message", (req, res, next) => {
-  const { user = null, message = "", timestamp = +new Date() } = req.body;
+  const {
+    user = null,
+    message = "",
+    timestamp = +new Date(),
+    customTextColor = "#000",
+  } = req.body;
   // const sentimentScore = sentiment.analyze(message).score;
-  const chat = { user, message, timestamp };
+  const chat = { user, message, timestamp, customTextColor };
 
   chatHistory.messages.push(chat);
   pusher.trigger("chat-room", "new-message", { chat });
