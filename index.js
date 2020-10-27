@@ -1,82 +1,72 @@
-const bodyParser = require("body-parser");
+/**
+ * @file The application root. Defines the Express server configuration.
+ */
+require("dotenv").config();
 const cors = require("cors");
 const express = require("express");
+const socketIo = require("socket.io");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
+
+const { errorHandler } = require("./middleware");
+
+const {
+  usersRouter,
+  itemsRouter,
+  accountsRouter,
+  institutionsRouter,
+  serviceRouter,
+  linkEventsRouter,
+  linkTokensRouter,
+  unhandledRouter,
+} = require("./routes");
+
 const app = express();
 
-const Pusher = require("pusher");
+const { PORT = 5000 } = process.env;
+// const PORT = process.env.PORT || 5000;
 
-const pusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID,
-  key: process.env.PUSHER_APP_KEY,
-  secret: process.env.PUSHER_APP_SECRET,
-  cluster: process.env.PUSHER_APP_CLUSTER,
-  encrypted: true,
+const server = app.listen(PORT, () => {
+  console.log(`listening on port ${PORT}`);
+});
+const io = socketIo(server);
+
+//const corsOptions = { origin: "https://open-banking-mauve.vercel.app" };
+//app.use(cors(corsOptions));
+
+app.use(logger("dev"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+// middleware to pass socket to each request object
+app.use((req, res, next) => {
+  req.io = io;
+  next();
 });
 
-// error im getting in dev is because not https
-// that's why you always run your server locally
-// const whitelist = ["http://localhost:3000", "https://overlay-test.vercel.app"];
-// const corsOptions = {
-//   origin: function (origin, callback) {
-//     if (whitelist.indexOf(origin) !== -1) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error("Not allowed by CORS"));
-//     }
-//   },
-// };
+// Set socket.io listeners.
+io.on("connection", (socket) => {
+  console.log("SOCKET CONNECTED");
 
-const corsOptions = { origin: "https://overlay-test.vercel.app" };
-
-app.use(cors(corsOptions));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-const PORT = process.env.PORT || 5000;
-
-app.set("port", PORT);
-app.listen(app.get("port"), () => {
-  console.log(`listening at localhost:${PORT}...`);
+  socket.on("disconnect", () => {
+    console.log("SOCKET DISCONNECTED");
+  });
 });
 
-const chatHistory = { messages: [] };
-
-app.get("/", function (req, res) {
-  //   console.log(req);
-  res.send("<pre>" + JSON.stringify(chatHistory, null, 2) + "</pre>");
+app.get("/test", (req, res) => {
+  res.send("test response");
 });
 
-// app.get("*", (req, res) => {
-//   return handler(req, res);
-// });
+app.use("/users", usersRouter);
+app.use("/items", itemsRouter);
+app.use("/accounts", accountsRouter);
+app.use("/institutions", institutionsRouter);
+app.use("/services", serviceRouter);
+app.use("/link-event", linkEventsRouter);
+app.use("/link-token", linkTokensRouter);
+app.use("*", unhandledRouter);
 
-app.post("/message", (req, res, next) => {
-  const {
-    user = null,
-    message = "",
-    timestamp = +new Date(),
-    customTextColor = "#000",
-  } = req.body;
-  // const sentimentScore = sentiment.analyze(message).score;
-  const chat = { user, message, timestamp, customTextColor };
-
-  chatHistory.messages.push(chat);
-  pusher.trigger("chat-room", "new-message", { chat });
-});
-
-app.post("/messages", (req, res, next) => {
-  res.json({ ...chatHistory, status: "success" });
-});
-
-app.post("/end-chat", (req, res, next) => {
-  console.log("/end-chat", req.body, "method", req.method);
-  const { name, channel } = req.body;
-  console.log("name", name, "channel_vacated", channel);
-  if (name === "channel_vacated") {
-    chatHistory.messages = [];
-    console.log("global chat history variable should be cleared", chatHistory);
-    res.json({ res: "Chat global variable cleared" });
-  }
-});
-
-app.listen();
+// Error handling has to sit at the bottom of the stack.
+// https://github.com/expressjs/express/issues/2718
+app.use(errorHandler);

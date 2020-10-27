@@ -1,1 +1,1 @@
-# charity-chat
+# open-banking backend
