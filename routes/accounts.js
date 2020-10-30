@@ -2,10 +2,10 @@
  * @file Defines all routes for the Accounts route.
  */
 
-const express = require('express');
-const { retrieveTransactionsByAccountId } = require('../db/queries');
-const { asyncWrapper } = require('../middleware');
-const { sanitizeTransactions } = require('../util');
+const express = require("express");
+const { retrieveTransactionsByAccountId } = require("../db/queries");
+const { asyncWrapper } = require("../middleware");
+const { sanitizeTransactions } = require("../util");
 
 const router = express.Router();
 
@@ -16,10 +16,16 @@ const router = express.Router();
  * @return {Object{[]}} an array of transactions
  */
 router.get(
-  '/:accountId/transactions',
+  "/:accountId/transactions",
   asyncWrapper(async (req, res) => {
     const { accountId } = req.params;
     const transactions = await retrieveTransactionsByAccountId(accountId);
+
+    // const { plaid_access_token: accessToken, user_id } = await retrieveItemById(
+    //   itemId
+    // );
+    // const { accounts } = await plaid.client.getAccounts(accessToken);
+
     res.json(sanitizeTransactions(transactions));
   })
 );

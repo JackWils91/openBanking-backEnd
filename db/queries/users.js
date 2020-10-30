@@ -2,7 +2,7 @@
  * @file Defines the queries for the users table/views.
  */
 
-const db = require('../');
+const db = require("../");
 
 /**
  * Creates a single user.
@@ -10,10 +10,10 @@ const db = require('../');
  * @param {string} username the username of the user.
  * @returns {Object} the new user.
  */
-const createUser = async username => {
+const createUser = async (username) => {
   const query = {
     // RETURNING is a Postgres-specific clause that returns a list of the inserted items.
-    text: 'INSERT INTO users_table (username) VALUES ($1) RETURNING *;',
+    text: "INSERT INTO users_table (username) VALUES ($1) RETURNING *;",
     values: [username],
   };
   const { rows } = await db.query(query);
@@ -27,9 +27,9 @@ const createUser = async username => {
  * @param {string[]} userId the desired user to be deleted.
  */
 
-const deleteUsers = async userId => {
+const deleteUsers = async (userId) => {
   const query = {
-    text: 'DELETE FROM users_table WHERE id = $1;',
+    text: "DELETE FROM users_table WHERE id = $1;",
     values: [userId],
   };
   await db.query(query);
@@ -41,9 +41,9 @@ const deleteUsers = async userId => {
  * @param {number} userId the ID of the user.
  * @returns {Object} a user.
  */
-const retrieveUserById = async userId => {
+const retrieveUserById = async (userId) => {
   const query = {
-    text: 'SELECT * FROM users WHERE id = $1',
+    text: "SELECT * FROM users WHERE id = $1",
     values: [userId],
   };
   const { rows } = await db.query(query);
@@ -57,9 +57,9 @@ const retrieveUserById = async userId => {
  * @param {string} username the username to search for.
  * @returns {Object} a single user.
  */
-const retrieveUserByUsername = async username => {
+const retrieveUserByUsername = async (username) => {
   const query = {
-    text: 'SELECT * FROM users WHERE username = $1',
+    text: "SELECT * FROM users WHERE username = $1",
     values: [username],
   };
   const { rows: users } = await db.query(query);
@@ -74,9 +74,11 @@ const retrieveUserByUsername = async username => {
  */
 const retrieveUsers = async () => {
   const query = {
-    text: 'SELECT * FROM users',
+    text: "SELECT * FROM users",
   };
+
   const { rows: users } = await db.query(query);
+  console.log("users-->", users);
   return users;
 };
 

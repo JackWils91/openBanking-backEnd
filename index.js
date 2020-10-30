@@ -32,7 +32,8 @@ const server = app.listen(PORT, () => {
 const io = socketIo(server);
 
 //const corsOptions = { origin: "https://open-banking-mauve.vercel.app" };
-//app.use(cors(corsOptions));
+const corsOptions = { origin: "http://localhost:3000" };
+app.use(cors(corsOptions));
 
 app.use(logger("dev"));
 app.use(express.json());

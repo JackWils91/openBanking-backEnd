@@ -2,7 +2,7 @@
  * @file Defines custom Express middleware functions.
  */
 
-const Boom = require('@hapi/boom');
+const Boom = require("@hapi/boom");
 
 /**
  * A higher-order function that wraps an async callback to properly trigger the
@@ -11,7 +11,7 @@ const Boom = require('@hapi/boom');
  * @param {Function} fn an async callback.
  * @returns {Function} an Express callback that resolves the wrapped async fn.
  */
-const asyncWrapper = fn => (req, res, next) => {
+const asyncWrapper = (fn) => (req, res, next) => {
   return Promise.resolve(fn(req, res, next)).catch(next);
 };
 
@@ -28,9 +28,9 @@ const asyncWrapper = fn => (req, res, next) => {
  */
 const errorHandler = (err, req, res, next) => {
   let error = err;
-
+  console.log("error-->", error);
   // handle errors from the Plaid api.
-  if (error.name === 'PlaidError')
+  if (error.name === "PlaidError")
     error = new Boom(error.error_message, { statusCode: error.status_code });
 
   // handle standard javascript errors.

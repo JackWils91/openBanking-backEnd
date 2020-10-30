@@ -2,8 +2,8 @@
  * @file Defines the queries for the accounts table/view.
  */
 
-const { retrieveItemByPlaidItemId } = require('./items');
-const db = require('../');
+const { retrieveItemByPlaidItemId } = require("./items");
+const db = require("../");
 
 /**
  * Creates multiple accounts related to a single item.
@@ -14,7 +14,7 @@ const db = require('../');
  */
 const createAccounts = async (plaidItemId, accounts) => {
   const { id: itemId } = await retrieveItemByPlaidItemId(plaidItemId);
-  const pendingQueries = accounts.map(async account => {
+  const pendingQueries = accounts.map(async (account) => {
     const {
       account_id: aid,
       name,
@@ -82,9 +82,9 @@ const createAccounts = async (plaidItemId, accounts) => {
  * @param {string} plaidAccountId the Plaid ID of the account.
  * @returns {Object} a single account.
  */
-const retrieveAccountByPlaidAccountId = async plaidAccountId => {
+const retrieveAccountByPlaidAccountId = async (plaidAccountId) => {
   const query = {
-    text: 'SELECT * FROM accounts WHERE plaid_account_id = $1',
+    text: "SELECT * FROM accounts WHERE plaid_account_id = $1",
     values: [plaidAccountId],
   };
   const { rows } = await db.query(query);
@@ -98,9 +98,9 @@ const retrieveAccountByPlaidAccountId = async plaidAccountId => {
  * @param {number} itemId the ID of the item.
  * @returns {Object[]} an array of accounts.
  */
-const retrieveAccountsByItemId = async itemId => {
+const retrieveAccountsByItemId = async (itemId) => {
   const query = {
-    text: 'SELECT * FROM accounts WHERE item_id = $1 ORDER BY id',
+    text: "SELECT * FROM accounts WHERE item_id = $1 ORDER BY id",
     values: [itemId],
   };
   const { rows: accounts } = await db.query(query);
@@ -113,9 +113,9 @@ const retrieveAccountsByItemId = async itemId => {
  * @param {number} userId the ID of the user.
  * @returns {Object[]} an array of accounts.
  */
-const retrieveAccountsByUserId = async userId => {
+const retrieveAccountsByUserId = async (userId) => {
   const query = {
-    text: 'SELECT * FROM accounts WHERE user_id = $1 ORDER BY id',
+    text: "SELECT * FROM accounts WHERE user_id = $1 ORDER BY id",
     values: [userId],
   };
   const { rows: accounts } = await db.query(query);

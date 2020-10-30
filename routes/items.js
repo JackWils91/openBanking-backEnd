@@ -2,8 +2,8 @@
  * @file Defines all routes for the Items route.
  */
 
-const express = require('express');
-const Boom = require('@hapi/boom');
+const express = require("express");
+const Boom = require("@hapi/boom");
 const {
   retrieveItemById,
   retrieveItemByPlaidInstitutionId,
@@ -12,16 +12,16 @@ const {
   createItem,
   deleteItem,
   updateItemStatus,
-} = require('../db/queries');
-const { asyncWrapper } = require('../middleware');
-const plaid = require('../plaid');
+} = require("../db/queries");
+const { asyncWrapper } = require("../middleware");
+const plaid = require("../plaid");
 const {
   sanitizeAccounts,
   sanitizeItems,
   sanitizeTransactions,
   isValidItemStatus,
   validItemStatuses,
-} = require('../util');
+} = require("../util");
 
 const router = express.Router();
 
@@ -34,9 +34,11 @@ const router = express.Router();
  * @param {string} userId the Plaid user ID of the active user.
  */
 router.post(
-  '/',
+  "/",
   asyncWrapper(async (req, res) => {
-    const { publicToken, institutionId, userId } = req.body;
+    const { publicToken, institutionId, userId, accounts } = req.body;
+
+    console.log("what accounts show?-->", accounts);
 
     // prevent duplicate items for the same institution per user.
     const existingItem = await retrieveItemByPlaidInstitutionId(
@@ -44,7 +46,7 @@ router.post(
       userId
     );
     if (existingItem)
-      throw new Boom('You have already linked an item at this institution.', {
+      throw new Boom("You have already linked an item at this institution.", {
         statusCode: 409,
       });
 
@@ -70,7 +72,7 @@ router.post(
  * @returns {Object[]} an array containing a single item.
  */
 router.get(
-  '/:itemId',
+  "/:itemId",
   asyncWrapper(async (req, res) => {
     const { itemId } = req.params;
     const item = await retrieveItemById(itemId);
@@ -85,7 +87,7 @@ router.get(
  * @returns {Object[]} an array containing a single item.
  */
 router.put(
-  '/:itemId',
+  "/:itemId",
   asyncWrapper(async (req, res) => {
     const { itemId } = req.params;
     const { status } = req.body;
@@ -93,7 +95,7 @@ router.put(
     if (status) {
       if (!isValidItemStatus(status)) {
         throw new Boom(
-          'Cannot set item status. Please use an accepted value.',
+          "Cannot set item status. Please use an accepted value.",
           {
             statusCode: 400,
             acceptedValues: [validItemStatuses.values()],
@@ -104,9 +106,9 @@ router.put(
       const item = await retrieveItemById(itemId);
       res.json(sanitizeItems(item));
     } else {
-      throw new Boom('You must provide updated item information.', {
+      throw new Boom("You must provide updated item information.", {
         statusCode: 400,
-        acceptedKeys: ['status'],
+        acceptedKeys: ["status"],
       });
     }
   })
@@ -121,7 +123,7 @@ router.put(
  * @returns status of 204 if successful
  */
 router.delete(
-  '/:itemId',
+  "/:itemId",
   asyncWrapper(async (req, res) => {
     const { itemId } = req.params;
     const { plaid_access_token: accessToken } = await retrieveItemById(itemId);
@@ -129,7 +131,7 @@ router.delete(
     const { removed, status_code } = await plaid.removeItem(accessToken);
 
     if (!removed)
-      throw new Boom('Item could not be removed in the Plaid API.', {
+      throw new Boom("Item could not be removed in the Plaid API.", {
         statusCode: status_code,
       });
 
@@ -145,10 +147,33 @@ router.delete(
  * @returns {Object[]} an array of accounts.
  */
 router.get(
-  '/:itemId/accounts',
+  "/:itemId/accounts",
   asyncWrapper(async (req, res) => {
     const { itemId } = req.params;
+    // this route goes to DB
     const accounts = await retrieveAccountsByItemId(itemId);
+
+    // this route goes to client bypassing DB
+    // const { plaid_access_token: accessToken, user_id } = await retrieveItemById(
+    //   itemId
+    // );
+    // const { accounts } = await plaid.client.getAccounts(accessToken);
+
+    // const mappedAccounts = accounts.map(
+    //   ({ account_id, balances, ...remaining }) => {
+    //     return {
+    //       id: account_id,
+    //       item_id: itemId,
+    //       user_id,
+    //       current_balance: balances.current,
+    //       available_balance: balances.available,
+    //       iso_currency_code: balances.iso_currency_code,
+    //       unofficial_currency_code: balances.unofficial_currency_code,
+    //       ...remaining,
+    //     };
+    //   }
+    // );
+
     res.json(sanitizeAccounts(accounts));
   })
 );
@@ -160,7 +185,7 @@ router.get(
  * @returns {Object[]} an array of transactions.
  */
 router.get(
-  '/:itemId/transactions',
+  "/:itemId/transactions",
   asyncWrapper(async (req, res) => {
     const { itemId } = req.params;
     const transactions = await retrieveTransactionsByItemId(itemId);
@@ -178,7 +203,7 @@ router.get(
  * @return {Object} the response from the Plaid API.
  */
 router.post(
-  '/sandbox/item/reset_login',
+  "/sandbox/item/reset_login",
   asyncWrapper(async (req, res) => {
     const { itemId } = req.body;
     const { plaid_access_token: accessToken } = await retrieveItemById(itemId);

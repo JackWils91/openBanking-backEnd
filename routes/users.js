@@ -2,8 +2,8 @@
  * @file Defines all routes for the Users route.
  */
 
-const express = require('express');
-const Boom = require('@hapi/boom');
+const express = require("express");
+const Boom = require("@hapi/boom");
 const {
   retrieveUsers,
   retrieveUserByUsername,
@@ -13,18 +13,18 @@ const {
   retrieveItemsByUser,
   retrieveTransactionsByUserId,
   retrieveUserById,
-} = require('../db/queries');
-const { asyncWrapper } = require('../middleware');
+} = require("../db/queries");
+const { asyncWrapper } = require("../middleware");
 const {
   sanitizeAccounts,
   sanitizeItems,
   sanitizeUsers,
   sanitizeTransactions,
-} = require('../util');
+} = require("../util");
 
 const router = express.Router();
 
-const plaid = require('../plaid');
+const plaid = require("../plaid");
 
 /**
  * Retrieves all users.
@@ -32,9 +32,10 @@ const plaid = require('../plaid');
  * @returns {Object[]} an array of users.
  */
 router.get(
-  '/',
+  "/",
   asyncWrapper(async (req, res) => {
     const users = await retrieveUsers();
+    console.log("users-->", users);
     res.json(sanitizeUsers(users));
   })
 );
@@ -48,13 +49,15 @@ router.get(
  * @returns {Object[]} an array containing the new user.
  */
 router.post(
-  '/',
+  "/",
   asyncWrapper(async (req, res) => {
     const { username } = req.body;
+    console.log("username-->", username);
     const usernameExists = await retrieveUserByUsername(username);
+    console.log("usernameExists-->", usernameExists);
     // prevent duplicates
     if (usernameExists)
-      throw new Boom('Username already exists', { statusCode: 409 });
+      throw new Boom("Username already exists", { statusCode: 409 });
     const newUser = await createUser(username);
     res.json(sanitizeUsers(newUser));
   })
@@ -67,7 +70,7 @@ router.post(
  * @returns {Object[]} an array containing a single user.
  */
 router.get(
-  '/:userId',
+  "/:userId",
   asyncWrapper(async (req, res) => {
     const { userId } = req.params;
     const user = await retrieveUserById(userId);
@@ -82,7 +85,7 @@ router.get(
  * @returns {Object[]} an array of items.
  */
 router.get(
-  '/:userId/items',
+  "/:userId/items",
   asyncWrapper(async (req, res) => {
     const { userId } = req.params;
     const items = await retrieveItemsByUser(userId);
@@ -97,7 +100,7 @@ router.get(
  * @returns {Object[]} an array of accounts.
  */
 router.get(
-  '/:userId/accounts',
+  "/:userId/accounts",
   asyncWrapper(async (req, res) => {
     const { userId } = req.params;
     const accounts = await retrieveAccountsByUserId(userId);
@@ -112,7 +115,7 @@ router.get(
  * @returns {Object[]} an array of transactions
  */
 router.get(
-  '/:userId/transactions',
+  "/:userId/transactions",
   asyncWrapper(async (req, res) => {
     const { userId } = req.params;
     const transactions = await retrieveTransactionsByUserId(userId);
@@ -126,7 +129,7 @@ router.get(
  * @param {string} userId the ID of the user.
  */
 router.delete(
-  '/:userId',
+  "/:userId",
   asyncWrapper(async (req, res) => {
     const { userId } = req.params;
 

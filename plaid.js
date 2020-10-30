@@ -2,13 +2,13 @@
  * @file Defines the connection to the Plaid client.
  */
 
-const forEach = require('lodash/forEach');
-const plaid = require('plaid');
+const forEach = require("lodash/forEach");
+const plaid = require("plaid");
 
 const {
   createPlaidApiEvent,
   retrieveItemByPlaidAccessToken,
-} = require('./db/queries');
+} = require("./db/queries");
 
 // Your Plaid API keys and secrets are loaded as environment variables.
 // They are set in your `.env` file. See the repo README for more info.
@@ -22,9 +22,9 @@ const {
 // The Plaid secret is unique per environment. Note that there is also a separate production key,
 // though we do not account for that here.
 const PLAID_SECRET =
-  PLAID_ENV === 'development' ? PLAID_SECRET_DEVELOPMENT : PLAID_SECRET_SANDBOX;
+  PLAID_ENV === "development" ? PLAID_SECRET_DEVELOPMENT : PLAID_SECRET_SANDBOX;
 
-const OPTIONS = { clientApp: 'Plaid-Pattern' };
+const OPTIONS = { clientApp: "Plaid-Pattern" };
 
 // We want to log requests to / responses from the Plaid API (via the Plaid client), as this data
 // can be useful for troubleshooting.
